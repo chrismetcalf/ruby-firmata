@@ -1,0 +1,66 @@
+#!/usr/bin/env ruby
+
+$:.unshift File.join(File.dirname(__FILE__), '../lib')
+
+require "rubygems"
+require "arduino"
+
+class DangerShield
+  BUTTON_1 = 2
+  BUTTON_2 = 7
+  BUTTON_3 = 4
+
+  SLIDER_1 = 18
+  SLIDER_2 = 17
+  SLIDER_3 = 16
+
+  BEEPER = 3
+
+  LED_1 = 6
+  LED_2 = 5
+
+  SLIDER_LED_1 = 11
+  SLIDER_LED_2 = 10
+  SLIDER_LED_3 = 9
+
+  def initialize(arduino)
+    @arduino = arduino
+  end
+
+  def setup
+    # Buttons
+    @arduino.pin_mode(BUTTON_1, Arduino::INPUT)
+    @arduino.pin_mode(BUTTON_2, Arduino::INPUT)
+    @arduino.pin_mode(BUTTON_3, Arduino::INPUT)
+
+    # Sliders
+    @arduino.pin_mode(SLIDER_1, Arduino::ANALOG)
+    @arduino.pin_mode(SLIDER_2, Arduino::ANALOG)
+    @arduino.pin_mode(SLIDER_3, Arduino::ANALOG)
+
+    # Slider LEDs
+    @arduino.pin_mode(SLIDER_LED_1, Arduino::PWM)
+    @arduino.pin_mode(SLIDER_LED_2, Arduino::PWM)
+    @arduino.pin_mode(SLIDER_LED_3, Arduino::PWM)
+
+    # Beeper
+    @arduino.pin_mode(BEEPER, Arduino::OUTPUT)
+
+    # LEDs
+    @arduino.pin_mode(LED_1, Arduino::OUTPUT)
+    @arduino.pin_mode(LED_2, Arduino::OUTPUT)
+  end
+
+  def draw
+    #pin_1 = @arduino.analog_read(SLIDER_1)
+    #puts "Pin 1: #{pin_1.inspect}"
+
+    button = @arduino.digital_read(BUTTON_1)
+    puts "Button 1: #{button.inspect}"
+
+    @arduino.delay(0.5)
+  end
+end
+
+arduino = Arduino.new(Dir["/dev/tty.usbserial*"][0], 57600)
+arduino.run(DangerShield)

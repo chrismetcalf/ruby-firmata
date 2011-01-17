@@ -1,5 +1,7 @@
-$:.unshift File.join(File.dirname(__FILE__), 'lib')
-Dir[File.join(File.dirname(__FILE__), 'samples', '*')].each { |sample| require sample }
+#!/usr/bin/env ruby
+
+$:.unshift File.join(File.dirname(__FILE__), '../lib')
+Dir[File.join(File.dirname(__FILE__), '../samples', '*')].each { |sample| require sample }
 
 require "rubygems"
 require "arduino"

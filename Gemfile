@@ -1,4 +1,6 @@
 source "http://rubygems.org"
+gem "serialport", "1.0.4"
+
 # Add dependencies required to use your gem here.
 # Example:
 #   gem "activesupport", ">= 2.3.5"
