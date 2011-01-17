@@ -14,7 +14,7 @@ class Arduino
   LOW = 0
   HIGH = 1
   MAX_DATA_BYTES = 32
-  
+
   DIGITAL_MESSAGE = 0x90 # send data for a digital port
   ANALOG_MESSAGE = 0xE0 # send data for an analog pin (or PWM)
   REPORT_ANALOG = 0xC0 # enable analog input by pin #
@@ -24,9 +24,9 @@ class Arduino
   SYSTEM_RESET = 0xFF # reset from MIDI
   START_SYSEX = 0xF0 # start a MIDI SysEx message
   END_SYSEX = 0xF7 # end a MIDI SysEx message
-  
+
   attr_reader :digital_input_data
-  
+
   def initialize(device, baud=57600)
     @device = device
     @baud = baud
@@ -44,11 +44,11 @@ class Arduino
     @minor_version = 0
     report
   end
-  
+
   def to_s
     "Arduino <%s>" % @device
   end
-  
+
   def run(klass)
     obj = klass.new(self)
     obj.setup
@@ -60,38 +60,38 @@ class Arduino
       @serial_port.close
     end
   end
-  
+
   def pin_mode(pin, mode)
     write(SET_PIN_MODE)
     write(pin)
     write(mode)
   end
-  
+
   # Reading from digital pin
   def digital_read(pin)
     (@digital_input_data[pin >> 3] >> (pin & 0x07)) & 0x01
   end
-  
+
   # Writing to a digital pin
   def digital_write(pin, value)
     port_number = (pin >> 3) & 0x0F
-    
+
     if value == 0
       @digital_output_data[port_number] &= ~(1 << (pin & 0x07))
     else
       @digital_output_data[port_number] |= (1 << (pin & 0x07))
     end
-    
+
     write(DIGITAL_MESSAGE | port_number)
     write(@digital_output_data[port_number] & 0x7F)
     write(@digital_output_data[port_number] >> 7)
   end
-  
+
   # Reading from analog pin
   def analog_read(pin)
     @analog_input_data[pin]
   end
-  
+
   # Writing to a analog pin
   def analog_write(pin, value)
     pin_mode(pin, PWM)
@@ -99,26 +99,26 @@ class Arduino
     write(value & 0x7F)
     write(value >> 7)
   end
-  
+
   # Setting a minor and major version
   def set_version(major, minor)
     @major_version = major
     @minor_version = minor
   end
-  
+
   # Waiting in seconds
   def delay(seconds)
     sleep(seconds)
   end
-  
+
   def parse
     data = @serial_port.read(1)
     p data
     process(data) unless data == "" or data == "\000"
   end
-  
+
   private
-  
+
   def process(input_data)
     # p input_data
     # p input_data.unpack('c')[0]
@@ -127,7 +127,7 @@ class Arduino
     # p input_data
     # Handling input data
     command = nil
-    
+
     if @parsing_sysex
       if input_data == END_SYSEX
         @parsing_sysex = false
@@ -165,18 +165,18 @@ class Arduino
 
     end
   end
-  
+
   def write(value)
     @serial_port.write(value.to_i.chr)
   end
-  
+
   # Reporting analog and digital pins
   def report
     (0..15).each do |i|
       write(REPORT_ANALOG | i)
       write(1)
     end
-    
+
     (0..1).each do |i|
       write(REPORT_DIGITAL | i)
       write(1)
